@@ -722,7 +722,8 @@ class Vault_test : public beast::unit_test::suite
 
         testCase(
             testDisabled(),
-            {.features = testable_amendments() - featureSingleAssetVault});
+            {.features = testable_amendments() - featureSingleAssetVault -
+                 featureLendingProtocol});
 
         testCase(
             testDisabled(tecNO_ENTRY),
