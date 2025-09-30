@@ -58,7 +58,8 @@ private:
             {},
             0,
             {},
-            {testable_amendments() - featureSingleAssetVault});
+            {testable_amendments() - featureSingleAssetVault -
+             featureLendingProtocol});
 
         // IOU to IOU
         testAMM(
@@ -7499,7 +7500,9 @@ private:
         };
 
         testCase(
-            "tecDUPLICATE", testable_amendments() - featureSingleAssetVault);
+            "tecDUPLICATE",
+            testable_amendments() - featureSingleAssetVault -
+                featureLendingProtocol);
         testCase(
             "terADDRESS_COLLISION",
             testable_amendments() | featureSingleAssetVault);
@@ -7881,6 +7884,8 @@ private:
     run() override
     {
         FeatureBitset const all{jtx::testable_amendments()};
+        FeatureBitset const featuresNoSAV =
+            all - featureSingleAssetVault - featureLendingProtocol;
         testInvalidInstance();
         testInstanceCreate();
         testInvalidDeposit(all);
@@ -7931,8 +7936,8 @@ private:
         testLPTokenBalance(all - fixAMMv1_3);
         testLPTokenBalance(all - fixAMMv1_1 - fixAMMv1_3);
         testAMMClawback(all);
-        testAMMClawback(all - featureSingleAssetVault);
-        testAMMClawback(all - featureAMMClawback - featureSingleAssetVault);
+        testAMMClawback(featuresNoSAV);
+        testAMMClawback(featuresNoSAV - featureAMMClawback);
         testAMMClawback(all - featureAMMClawback);
         testAMMClawback(all - fixAMMv1_1 - fixAMMv1_3 - featureAMMClawback);
         testAMMDepositWithFrozenAssets(all);
