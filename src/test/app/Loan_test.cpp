@@ -2674,9 +2674,19 @@ protected:
                             state.paymentRemaining,
                             broker.params.managementFeeRate);
 
+#if LOANFILLSHORTAGE
+                    BEAST_EXPECT(
+                        paymentComponents.trackedValueDelta ==
+                            roundedPeriodicPayment ||
+                        (paymentComponents.specialCase ==
+                             detail::PaymentSpecialCase::final &&
+                         paymentComponents.trackedValueDelta <
+                             roundedPeriodicPayment));
+#else
                     BEAST_EXPECT(
                         paymentComponents.trackedValueDelta <=
                         roundedPeriodicPayment);
+#endif
 
                     ripple::LoanState const nextTrueState =
                         calculateRawLoanState(
