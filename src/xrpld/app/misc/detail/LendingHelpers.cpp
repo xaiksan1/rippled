@@ -1215,7 +1215,6 @@ computePaymentComponents(
             "ripple::detail::computePaymentComponents",
             "excess non-negative");
     };
-#if LOANFILLSHORTAGE
     auto giveTo =
         [](Number& component, Number& shortage, Number const& maximum) {
             if (shortage > beast::zero)
@@ -1233,14 +1232,12 @@ computePaymentComponents(
                 "ripple::detail::computePaymentComponents",
                 "excess non-negative");
         };
-#endif
     auto addressExcess = [&takeFrom](LoanDeltas& deltas, Number& excess) {
         // This order is based on where errors are the least problematic
         takeFrom(deltas.interestDueDelta, excess);
         takeFrom(deltas.managementFeeDueDelta, excess);
         takeFrom(deltas.principalDelta, excess);
     };
-#if LOANFILLSHORTAGE
     auto addressShortage = [&giveTo](
                                LoanDeltas& deltas,
                                Number& shortage,
@@ -1250,7 +1247,6 @@ computePaymentComponents(
         giveTo(
             deltas.managementFeeDueDelta, shortage, current.managementFeeDue);
     };
-#endif
     Number totalOverpayment =
         deltas.valueDelta() - currentLedgerState.valueOutstanding;
     if (totalOverpayment > beast::zero)
@@ -1279,7 +1275,6 @@ computePaymentComponents(
 
         shortage = -excess;
     }
-#if LOANFILLSHORTAGE
     else if (shortage > beast::zero && totalOverpayment < beast::zero)
     {
         // If there's a shortage, and there's room in the loan itself, we can
@@ -1297,16 +1292,6 @@ computePaymentComponents(
         shortage == beast::zero,
         "ripple::detail::computePaymentComponents",
         "no shortage or excess");
-#else
-    // The shortage should never be negative, which indicates that the
-    // parts are trying to take more than the whole payment. The
-    // shortage may be positive, which indicates that we're not going to
-    // take the whole payment amount.
-    XRPL_ASSERT_PARTS(
-        shortage >= beast::zero,
-        "ripple::detail::computePaymentComponents",
-        "no shortage or excess");
-#endif
 #if LOANCOMPLETE
     /*
     // This used to be part of the above assert. It will eventually be removed
